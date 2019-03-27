@@ -27,5 +27,52 @@ Pour utiliser le même ensemble de données en Belgique, les classes carton et p
 ## Augumentation de données
 Étant donné que notre ensemble de données contenait un petit nombre d'images, au moins en comparaison avec l'ensemble de données ImageNet, qui était  utilisé initialement pour entrainer les modèles et qui compte actuellement plus de 14 millions d'images, nous avons utilisé quelques techniques d'accroissement de données pour l'augmenter artificiellement. Pour le modèle Inception, nous avons utilisé les transformations: cisaillement, zoom, retournement horizontal, rotation, décalage en largeur et en décalage en hauteur.
 ![Augumentation de données](/images/transformations.png)
+# Les architectures des réseaux des neurones convolutifs 
+La création d'un modèle d'apprentissage approfondi personnalisé nécessite de nombreuses ressources de calcul et de nombreuses données d'entrainement. Cependant, il existe déjà des modèles tels que Inception, VGG, DenseNet, ResNet, etc., qui fonctionnent assez bien pour classer les images de différentes catégories.
+Étant un bon compromis entre la précision et le nombre d'opérations, on a choisi d’utiliser un modèle pré-entrainé Inception v3 [7] et un modèle VGG16 [8] pour comparaison.
+![Les modeles des reseaux de neurones](/images/modeles.png)
+La création d'un modèle d'apprentissage approfondi personnalisé nécessite de nombreuses ressources de calcul et de nombreuses données d'entrainement. Cependant, il existe déjà des modèles tels que Inception, VGG, DenseNet, ResNet, etc., qui fonctionnent assez bien pour classer les images de différentes catégories. 
+## Inception V3
+![Inception V3](/images/inceptionV3.png)
+InceptionV3 est le premier modèle que nous avons abordé dans notre projet. Son architecture a pour objectif de réduire l’utilisation des ressources informatiques dans le cadre d’une classification très précise des images, en augmentant la taille et la profondeur, et en utilisant la faible densité des couches. Il dispose de 42 couches profondes et utilise des images avec une résolution de 299 par 299.
+Ce modèle est composé de deux parties:
+- La partie qui extrait des caractéristiques composé d’un réseau de neurones convolutifs.
+- La partie pour la classification composé de couches entièrement connectées et softmax.
+## VGG16
+![VGG16](/images/vgg16.png)
+## Les couches de neurones
+Ces differents modeles sont constitués de plusieurs types de couches combinées.
+### La couche de convolution 
+Elle est la composante clé de réseaux de neurones convolutifs. Elle est utilisée pour repérer la présence d’un ensemble de motifs dans les images.
+![Couche de convolution](/images/convolution.png)
+![Resultat après le filtrage](/images/convolution2.png)
+### La couche de pooling
+Elle reçoit plusieurs feature maps (descripteurs) et réduit leur taille, tout en conservant leurs caractéristiques importantes.
+![Pooling](/images/pooling.jpg)
+### La couche de correction ReLU 
+Elle joue le rôle de fonction d’activation en remplaçant toutes les valeurs négatives reçues en entrée par des zéros.
+![ReLU](/images/relu.png)
+### La couche fully-connected
+Elle constitue tout le temps la dernière couche d’un réseau de neurones. Elle reçoit un vecteur en entrée et donne en sortie un nouveau vecteur de taille différente, contenant les probabilités que l’image analysée appartient à une certaine classe et obtenu en appliquant une combinaison linéaire aux valeurs reçues. 
+![Fully_connected](/images/fully_connected.png)
+# Transfer learning
+L’apprentissage par transfert fonctionne en utilisant des modèles déjà entrainés sur de plus grands jeux de données pour, en même temps, réduire le temps d’entrainement et améliorer la détection. Dans ce contexte, on va entrainer seulement les dernières couches pour les adapter à la nouvelle liste des classes. 
 
+Une autre manière de diminuer le temps d’entrainement est en utilisant un GPU :
+Intel Xeon Quad 24GB RAM: 13h08
+GeForce RTX 2070 8GB: 1h42
 
+Pendant le training, les premières couches des réseaux de neurones convolutifs apprennent à identifier les motifs généraux. Cette partie d’extraction des caractéristiques peut être après réutilisée pour construire un nouveau modèle.
+
+L’entrainement initial de ces deux modèles (IncetionV3 et VGG16 )est fait en utilisant le dataset ImageNet qui contient approx. 14 million des images appartenant aux 1000 classes.
+
+# Résultats
+## Le modèle VGG16
+Avec le modèle VGG16 nous obtenons une précision catégorique d’environ 51%.
+Certaines classes de déchets sont très mal prédites.
+La mauvaise prédiction du verre et du plastique s’explique par le fait que les images dans le dataset se ressemblent beaucoup. On peut améliorer la précision de ce modèle en utilisant l’apprentissage par transfert – 85±3%
+![](/images/glass_plastic.png)
+## Le modèle Inception v3 pré-entrainé
+Pour le système de recyclage américain (6 catégories), 80% des prédictions sont bonnes.
+Pour le système de recyclage belge (4 catégories), 85% des prédictions sont bonnes.
+Une précision moyenne d’approximativement 81±2%, ce qui correspond à nos attentes. La variation de la précision dépend du jeu d’images utilisées pour tester le modèle.
